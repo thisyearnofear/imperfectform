@@ -247,6 +247,7 @@ function checkOrientation() {
     // Device is in landscape mode
     document.getElementById("orientationMessage").style.display = "none";
     document.getElementById("game-container").style.display = "flex";
+    document.getElementById("game-container").style.height = "100vh"; // Ensure it takes up the full viewport height
   }
 }
 
