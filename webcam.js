@@ -54,6 +54,8 @@ function setup() {
   pushUpCounter.class("push-up-counter styled-text");
   pushUpCounter.hide(); // Hide initially
 
+  // Show initial welcome message
+  showView("#welcomeMessage");
   typeWriterEffect(select("#welcomeMessage"), [
     "Welcome To The Onchain Olympics",
     "First Challenge",
@@ -61,6 +63,7 @@ function setup() {
     "Click RESET To Proceed",
   ]);
 }
+
 function typeWriterEffect(element, text, callback) {
   let i = 0;
   let j = 0;
@@ -134,11 +137,13 @@ function showInstructions() {
 }
 function updateInstructions() {
   let instructions = select("#instructions");
-  instructions.html(
-    "Ensure good lighting and that your upper body is visible. Press 'Start' when ready."
-  );
-  var msg = new SpeechSynthesisUtterance("Loading, please wait...");
-  window.speechSynthesis.speak(msg);
+  instructions.html(`
+    Press <span class="button-text start">START</span> to begin<br>
+    Press <span class="button-text stop">STOP</span> to end<br>
+    Press <span class="button-text reset">RESET</span> to start again<br>
+    Try your best, have fun!
+  `);
+  addGoldMedalArrow();
 }
 
 const loadingInstructions = [
@@ -154,8 +159,7 @@ function startDetection() {
   if (!started) {
     started = true;
     loading = true;
-    select("#instructions").hide();
-    loadingContainer.show();
+    showView(".loading-container");
 
     // Show the timer
     timer.show();
@@ -180,6 +184,17 @@ function startDetection() {
         console.error("Error starting audio context:", error);
       });
   }
+}
+
+function showView(viewToShow) {
+  // Hide all views
+  select("#welcomeMessage").hide();
+  select("#instructions").hide();
+  select(".loading-container").hide();
+  select("#canvasContainer").hide();
+
+  // Show the requested view
+  select(viewToShow).show();
 }
 
 function startTimer() {
@@ -223,7 +238,7 @@ function cycleLoadingInstructions() {
 
 function hideLoadingScreen() {
   loading = false;
-  loadingContainer.hide();
+  showView("#canvasContainer");
   clearInterval(loadingInstructionInterval);
 }
 
@@ -248,6 +263,7 @@ function checkOrientation() {
     document.getElementById("orientationMessage").style.display = "none";
     document.getElementById("game-container").style.display = "flex";
     document.getElementById("game-container").style.height = "100vh"; // Ensure it takes up the full viewport height
+    document.getElementById("game-container").style.overflowY = "auto"; // Ensure vertical scrolling is enabled
   }
 }
 
@@ -317,13 +333,16 @@ function resetDetection() {
   videoInitialized = false;
   started = false;
   reps = 0;
-  timeLeft = 120; // Reset the timer
-  firstPushUpDetected = false; // Reset the push-up detection flag
-  timer.html(formatTime(timeLeft)); // Reset the timer display
-  showInstructions(); // Show instructions when reset is pressed
-  clear(); // Clear the canvas
+  timeLeft = 120;
+  firstPushUpDetected = false;
+  timer.html(formatTime(timeLeft));
+  clear();
   console.log("Application reset");
-  loop(); // Restart the draw loop if needed
+  loop();
+
+  // Show instructions
+  showView("#instructions");
+  updateInstructions();
 }
 
 function startUserAudio() {
@@ -369,7 +388,7 @@ async function getPoses() {
 }
 
 function draw() {
-  if (loading) {
+  if (loading || !started) {
     return;
   }
 
