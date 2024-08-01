@@ -238,6 +238,24 @@ function stopDetection() {
   console.log("Detection stopped");
 }
 
+function checkOrientation() {
+  if (window.innerHeight > window.innerWidth) {
+    // Device is in portrait mode
+    document.getElementById("orientationMessage").style.display = "flex";
+    document.getElementById("game-container").style.display = "none";
+  } else {
+    // Device is in landscape mode
+    document.getElementById("orientationMessage").style.display = "none";
+    document.getElementById("game-container").style.display = "flex";
+  }
+}
+
+// Check orientation on load
+window.addEventListener("load", checkOrientation);
+
+// Check orientation on resize
+window.addEventListener("resize", checkOrientation);
+
 function showSummary() {
   const summaryModal = select("#summaryModal");
   const summaryText = select("#summaryText");
@@ -288,23 +306,6 @@ function stopDetection() {
 
   // Show summary modal
   showSummary();
-}
-
-function resetDetection() {
-  if (video) {
-    video.stop();
-    video.remove();
-  }
-  videoInitialized = false;
-  started = false;
-  reps = 0;
-  timeLeft = 120; // Reset the timer
-  firstPushUpDetected = false; // Reset the push-up detection flag
-  timer.html(formatTime(timeLeft)); // Reset the timer display
-  showInstructions(); // Show instructions when reset is pressed
-  clear(); // Clear the canvas
-  console.log("Application reset");
-  loop(); // Restart the draw loop if needed
 }
 
 function resetDetection() {
