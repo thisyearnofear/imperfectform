@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Onchain Olympics</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"
+      defer
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"
+      defer
+    ></script>
+  </head>
+  <body>
+    <div id="game-container">
+      <div id="banner">
+        <div class="olympic-rings" aria-label="Olympic Rings">
+          <div class="ring blue"></div>
+          <div class="ring yellow"></div>
+          <div class="ring black"></div>
+          <div class="ring green"></div>
+          <div class="ring red"></div>
+        </div>
+        <h1>Onchain Olympics</h1>
+      </div>
+      <div id="screen">
+        <div id="welcomeMessage" class="typewriter" aria-live="polite"></div>
+        <div id="instructions" style="display: none" aria-live="polite">
+          <p>a) Press START to begin</p>
+          <p>b) Press STOP to end</p>
+          <p>c) Press RESET to start again</p>
+          <p>d) Try your best, have fun!</p>
+        </div>
+        <div id="canvasContainer" aria-label="Game Canvas"></div>
+        <div class="loading-container" style="display: none" aria-live="polite">
+          <div class="loading-text">Loading...</div>
+          <div class="loading-rings" aria-label="Loading animation">
+            <div class="loading-ring"></div>
+            <div class="loading-ring"></div>
+            <div class="loading-ring"></div>
+          </div>
+          <div class="loading-instruction"></div>
+        </div>
+        <div class="timer" style="display: none" aria-live="polite">00:00</div>
+      </div>
+      <div id="controls">
+        <button id="startButton">START</button>
+        <button id="stopButton">STOP</button>
+        <button id="resetButton">RESET</button>
+      </div>
+    </div>
+    <!-- Modal Dialog -->
+    <div id="summaryModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Workout Summary</h2>
+        <div
+          class="olympic-rings"
+          aria-label="Olympic Rings"
+          style="justify-content: center"
+        >
+          <div class="ring blue"></div>
+          <div class="ring yellow"></div>
+          <div class="ring black"></div>
+          <div class="ring green"></div>
+          <div class="ring red"></div>
+        </div>
+        <p id="summaryText"></p>
+        <div id="medal" class="medal"></div>
+        <div class="share-button">
+          <a href="#" id="shareTwitter" target="_blank">Share on Twitter</a>
+        </div>
+        <p>Click RESET to start again</p>
+      </div>
+    </div>
+    <noscript>
+      <p>
+        This application requires JavaScript to run. Please enable JavaScript in
+        your browser settings.
+      </p>
+    </noscript>
+    <script src="webcam.js"></script>
+  </body>
+</html>
