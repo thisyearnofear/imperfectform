@@ -1,3 +1,4 @@
+/* Base styles */
 body,
 html {
   margin: 0;
@@ -9,6 +10,7 @@ html {
   overflow: hidden;
 }
 
+/* Layout */
 #game-container {
   display: flex;
   flex-direction: column;
@@ -18,6 +20,7 @@ html {
   overflow-y: auto;
 }
 
+/* Banner */
 #banner {
   display: flex;
   align-items: center;
@@ -61,6 +64,7 @@ h1 {
   text-shadow: 2px 2px #000;
 }
 
+/* Game screen */
 #screen {
   position: relative;
   width: 100%;
@@ -81,6 +85,7 @@ h1 {
   height: 100%;
 }
 
+/* Messages and instructions */
 #welcomeMessage,
 #instructions {
   position: absolute;
@@ -99,6 +104,7 @@ h1 {
   text-align: center;
 }
 
+/* Loading animation */
 .loading-container {
   position: absolute;
   top: 50%;
@@ -154,6 +160,8 @@ h1 {
     opacity: 1;
   }
 }
+
+/* Timer and counter */
 .timer {
   position: absolute;
   top: 10px;
@@ -162,6 +170,17 @@ h1 {
   color: #fcb131;
 }
 
+.push-up-counter {
+  font-size: 18px;
+  color: #fcb131;
+  text-shadow: 2px 2px #000;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+}
+
+/* Controls */
 #controls {
   display: flex;
   justify-content: center;
@@ -194,6 +213,117 @@ button:hover {
 #resetButton {
   background-color: #0081c8;
 }
+#toggleFullScreen {
+  position: relative;
+  overflow: hidden; /* Ensure the overlay does not spill outside the button */
+}
+
+.coming-soon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75); /* Semi-transparent black background */
+  color: #fcb131; /* Gold color text */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px; /* Smaller font size for the overlay text */
+  text-transform: uppercase;
+  pointer-events: none; /* Prevents interaction with the overlay */
+}
+
+.button-text {
+  display: inline-block;
+  font-size: 18px;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 5px;
+  text-transform: uppercase;
+}
+
+.button-text.start {
+  background-color: #00a651;
+  color: #fff;
+}
+.button-text.stop {
+  background-color: #ee334e;
+  color: #fff;
+}
+.button-text.reset {
+  background-color: #0081c8;
+  color: #fff;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-content {
+  background-color: #000;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  color: #fff;
+  text-align: center;
+  font-family: "Press Start 2P", cursive;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Medal */
+.medal {
+  margin-top: 20px;
+  font-size: 24px;
+  color: #ffd700;
+}
+
+.medal-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+/* Miscellaneous */
+.built-by {
+  text-align: center;
+  font-size: 16px;
+  color: #fcb131;
+  margin-top: 20px;
+}
+
+.highlight {
+  color: #800080;
+}
+
+.styled-text {
+  font-family: "Press Start 2P", cursive;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 5px;
+}
 
 .typewriter {
   overflow: hidden;
@@ -223,128 +353,163 @@ button:hover {
   }
 }
 
-.button-text {
-  display: inline-block;
-  font-size: 18px;
-  padding: 5px 10px;
-  margin: 2px;
-  border-radius: 5px;
-  text-transform: uppercase;
-}
-
-.button-text.start {
-  background-color: #00a651;
-  color: #fff;
-}
-.button-text.stop {
-  background-color: #ee334e;
-  color: #fff;
-}
-.button-text.reset {
-  background-color: #0081c8;
-  color: #fff;
-}
-
 .gold-medal-arrow {
   width: 60px;
   height: 90px;
   background-color: #ffd700;
   border-radius: 30px 30px 5px 5px;
   position: absolute;
-  bottom: 70px; /* Adjust this value to position the arrow above the buttons */
+  bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-#instructions {
-  position: relative;
+/* Fullscreen */
+#game-container.fullscreen {
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+#screen.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: #000;
+  display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#canvasContainer.fullscreen {
+  width: 100%;
   height: 100%;
+}
+
+#canvasContainer.fullscreen canvas,
+#canvasContainer.fullscreen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensure the video covers the entire container */
+}
+
+/* Orientation message */
+.orientation-message {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 1000;
   padding: 20px;
   box-sizing: border-box;
-  text-align: center;
-}
-
-.push-up-counter {
-  font-size: 18px;
-  color: #fcb131;
-  text-shadow: 2px 2px #000;
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-}
-
-.styled-text {
-  font-family: "Press Start 2P", cursive;
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1000; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
-}
-
-.modal-content {
-  background-color: #000;
-  margin: 15% auto; /* 15% from the top and centered */
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%; /* Could be more or less, depending on screen size */
-  color: #fff;
-  text-align: center;
-  font-family: "Press Start 2P", cursive;
-}
-
-.close-button {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-  color: #fff;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.medal {
-  margin-top: 20px;
-  font-size: 24px;
-  color: #ffd700; /* Gold color */
-}
-
-.medal-icon {
-  font-size: 48px;
-  margin-bottom: 20px;
-}
-
-.built-by {
-  text-align: center;
-  font-size: 16px;
-  color: #fcb131;
-  margin-top: 20px;
-}
-
-.highlight {
-  color: #800080; /* Purple color */
 }
 
 /* Mobile Styles */
+@media (max-width: 768px) {
+  body,
+  html {
+    font-size: 14px;
+  }
+
+  .button-text {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+
+  .loading-text {
+    font-size: 20px;
+  }
+
+  .loading-instruction {
+    font-size: 16px;
+  }
+
+  .modal-content {
+    font-size: 14px;
+  }
+
+  #game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  #banner {
+    flex-direction: column;
+    margin-bottom: 10px;
+  }
+
+  .olympic-rings {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  #screen {
+    width: 100%;
+    height: auto;
+    border: 2px solid #fff;
+    flex-grow: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  #canvasContainer {
+    width: 100%;
+    height: auto;
+  }
+
+  .timer {
+    font-size: 16px;
+    top: 5px;
+    right: 5px;
+  }
+
+  #controls {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    margin-top: 10px;
+  }
+
+  button {
+    margin: 5px;
+    width: auto;
+  }
+
+  .modal-content {
+    width: 90%;
+    padding: 10px;
+  }
+
+  .push-up-counter {
+    font-size: 14px;
+    top: 5px;
+    left: 5px;
+  }
+}
+
+/* Landscape-specific styles */
 @media (max-width: 768px) and (orientation: landscape) {
   #game-container {
     display: flex;
@@ -402,23 +567,6 @@ button:hover {
     width: auto; /* Adjust width to fit content */
   }
 
-  #startButton {
-    background-color: #00a651;
-  }
-  #stopButton {
-    background-color: #ee334e;
-  }
-  #resetButton {
-    background-color: #0081c8;
-  }
-
-  .timer {
-    font-size: 16px;
-    top: 5px;
-    right: 5px;
-    color: #fcb131;
-  }
-
   .modal-content {
     width: 90%;
     padding: 10px;
@@ -431,45 +579,74 @@ button:hover {
   }
 }
 
-@media (max-width: 768px) {
-  body,
-  html {
-    font-size: 14px;
-  }
+/* Portrait-specific styles */
+@media (max-width: 768px) and (orientation: portrait) {
+  @media (max-width: 768px) and (orientation: portrait) {
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh; /* Ensure it takes up the full viewport height */
+      overflow-y: auto; /* Allow vertical scrolling */
+    }
 
-  .button-text {
-    font-size: 16px;
-    padding: 8px 12px;
-  }
+    #banner {
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
 
-  .loading-text {
-    font-size: 20px;
-  }
+    .olympic-rings {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
 
-  .loading-instruction {
-    font-size: 16px;
-  }
+    h1 {
+      font-size: 20px;
+    }
 
-  .modal-content {
-    font-size: 14px;
-  }
-}
+    #screen {
+      width: 100%;
+      height: auto;
+      border: 2px solid #fff;
+      flex-grow: 1; /* Allow the screen to grow and take up available space */
+      min-height: 0;
+      overflow-y: auto;
+    }
 
-.orientation-message {
-  display: none; /* Hidden by default */
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-size: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  z-index: 1000;
-  padding: 20px;
-  box-sizing: border-box;
+    #canvasContainer {
+      width: 100%;
+      height: auto;
+    }
+
+    .timer {
+      font-size: 16px;
+      top: 5px;
+      right: 5px;
+    }
+
+    #controls {
+      flex-direction: row; /* Display buttons side by side */
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap; /* Allow wrapping if needed */
+      flex-shrink: 0;
+      margin-top: 10px; /* Add margin to ensure buttons are visible */
+    }
+
+    button {
+      margin: 5px;
+      width: auto; /* Adjust width to fit content */
+    }
+
+    .modal-content {
+      width: 90%;
+      padding: 10px;
+    }
+
+    .push-up-counter {
+      font-size: 14px;
+      top: 5px;
+      left: 5px;
+    }
+  }
 }

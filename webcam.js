@@ -28,7 +28,8 @@ let firstPushUpDetected = false;
 let typewriterUsed = false; // Flag to track if the typewriter effect has been used
 
 function setup() {
-  createCanvas(640, 480).parent("canvasContainer");
+  let canvas = createCanvas(640, 480);
+  canvas.parent("canvasContainer");
 
   let startButton = select("#startButton");
   startButton.mousePressed(startDetection);
@@ -62,6 +63,28 @@ function setup() {
     "PUSHUPS 💪",
     "Click RESET To Proceed",
   ]);
+  windowResized();
+
+  document.addEventListener("fullscreenchange", () => {
+    const screen = document.getElementById("screen");
+    const canvasContainer = document.getElementById("canvasContainer");
+    const canvas = document.querySelector("#canvasContainer canvas");
+    const video = document.querySelector("#canvasContainer video");
+
+    if (!document.fullscreenElement) {
+      screen.classList.remove("fullscreen");
+      canvasContainer.classList.remove("fullscreen");
+      if (canvas) canvas.classList.remove("fullscreen");
+      if (video) video.classList.remove("fullscreen");
+    }
+  });
+
+  document.addEventListener("fullscreenchange", windowResized);
+}
+
+function windowResized() {
+  const canvasContainer = select("#canvasContainer");
+  resizeCanvas(canvasContainer.width, canvasContainer.height);
 }
 
 function typeWriterEffect(element, text, callback) {
@@ -292,49 +315,52 @@ function adjustLayoutForMobile() {
   }
 }
 
+function toggleFullScreen() {
+  const screen = document.getElementById("screen");
+  const canvasContainer = document.getElementById("canvasContainer");
+  const video = document.querySelector("#canvasContainer video");
+
+  if (!document.fullscreenElement) {
+    screen.requestFullscreen().catch((err) => {
+      alert(
+        `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
+      );
+    });
+    screen.classList.add("fullscreen");
+    canvasContainer.classList.add("fullscreen");
+    video.classList.add("fullscreen");
+  } else {
+    document.exitFullscreen().catch((err) => {
+      alert(
+        `Error attempting to exit full-screen mode: ${err.message} (${err.name})`
+      );
+    });
+    screen.classList.remove("fullscreen");
+    canvasContainer.classList.remove("fullscreen");
+    video.classList.remove("fullscreen");
+  }
+}
+
+function dismissOrientationMessage() {
+  document.getElementById("orientationMessage").style.display = "none";
+  document.getElementById("game-container").style.display = "flex";
+}
+
 // Check orientation on load
 window.addEventListener("load", checkOrientation);
 
 // Check orientation on resize
 window.addEventListener("resize", checkOrientation);
 
-function showSummary() {
-  const summaryModal = select("#summaryModal");
-  const summaryText = select("#summaryText");
-  const medal = select("#medal");
+// Toggle full-screen mode
+document
+  .getElementById("toggleFullScreen")
+  .addEventListener("click", toggleFullScreen);
 
-  // Calculate time spent
-  const timeSpent = 120 - timeLeft;
-  const formattedTimeSpent = formatTime(timeSpent);
-
-  // Determine medal based on reps
-  let medalText = "";
-  if (reps >= 30) {
-    medalText = "🏅 Gold Medal! Excellent job!";
-  } else if (reps >= 20) {
-    medalText = "🥈 Silver Medal! Great effort!";
-  } else if (reps >= 10) {
-    medalText = "🥉 Bronze Medal! Good work!";
-  } else {
-    medalText = "Keep practicing and you'll get there!";
-  }
-
-  // Set summary text
-  summaryText.html(`
-    <p>Push-Ups Completed: ${reps}</p>
-    <p>Time Spent: ${formattedTimeSpent}</p>
-    <p>${medalText}</p>
-    <p>Stay consistent, stay healthy, and keep pushing your limits!</p>
-  `);
-
-  // Show the modal
-  summaryModal.style("display", "block");
-
-  // Close button functionality
-  select(".close-button").mousePressed(() => {
-    summaryModal.style("display", "none");
-  });
-}
+// Dismiss orientation message
+document
+  .getElementById("dismissOrientation")
+  .addEventListener("click", dismissOrientationMessage);
 
 function stopDetection() {
   if (video) {
@@ -386,19 +412,38 @@ function startUserAudio() {
 
 async function initDetector() {
   detectorConfig = {
-    modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
+    modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
   };
   try {
+    // Try to create a detector with WebGL
     detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
       detectorConfig
     );
-    detectorReady = true;
-    hideLoadingScreen();
-    getPoses();
   } catch (error) {
-    console.error("Error initializing detector:", error);
+    console.warn("WebGL initialization failed, trying CPU fallback.");
+    try {
+      // If WebGL fails, try to use CPU backend
+      await tf.setBackend("cpu");
+      detector = await poseDetection.createDetector(
+        poseDetection.SupportedModels.MoveNet,
+        {
+          ...detectorConfig,
+          modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+        }
+      );
+    } catch (cpuError) {
+      console.error("Error initializing detector:", cpuError);
+      alert(
+        "Unable to initialize pose detection. Please try a different browser or device."
+      );
+      return;
+    }
   }
+
+  detectorReady = true;
+  hideLoadingScreen();
+  getPoses();
 }
 
 async function getPoses() {
