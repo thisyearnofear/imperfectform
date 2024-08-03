@@ -264,6 +264,31 @@ function checkOrientation() {
     document.getElementById("game-container").style.display = "flex";
     document.getElementById("game-container").style.height = "100vh"; // Ensure it takes up the full viewport height
     document.getElementById("game-container").style.overflowY = "auto"; // Ensure vertical scrolling is enabled
+    adjustLayoutForMobile();
+  }
+}
+
+function adjustLayoutForMobile() {
+  if (
+    window.matchMedia("(max-width: 768px) and (orientation: landscape)").matches
+  ) {
+    const gameContainer = document.getElementById("game-container");
+    const screen = document.getElementById("screen");
+    const controls = document.getElementById("controls");
+
+    const availableHeight = window.innerHeight;
+    const controlsHeight = controls.offsetHeight;
+    const bannerHeight = document.getElementById("banner").offsetHeight;
+
+    screen.style.maxHeight = `${
+      availableHeight - controlsHeight - bannerHeight - 40
+    }px`; // Adjusted for padding
+
+    // Ensure the container is scrollable
+    gameContainer.style.overflowY = "auto";
+
+    // Scroll to show the screen fully
+    screen.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 }
 
@@ -343,30 +368,6 @@ function resetDetection() {
   // Show instructions
   showView("#instructions");
   updateInstructions();
-}
-
-function adjustLayoutForMobile() {
-  if (
-    window.matchMedia("(max-width: 812px) and (orientation: landscape)").matches
-  ) {
-    const gameContainer = document.getElementById("game-container");
-    const screen = document.getElementById("screen");
-    const controls = document.getElementById("controls");
-
-    const availableHeight = window.innerHeight;
-    const controlsHeight = controls.offsetHeight;
-    const bannerHeight = document.getElementById("banner").offsetHeight;
-
-    screen.style.maxHeight = `${
-      availableHeight - controlsHeight - bannerHeight - 40
-    }px`; // Adjusted for padding
-
-    // Ensure the container is scrollable
-    gameContainer.style.overflowY = "auto";
-
-    // Scroll to show the screen fully
-    screen.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
 }
 
 function startUserAudio() {
