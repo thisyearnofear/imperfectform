@@ -345,6 +345,30 @@ function resetDetection() {
   updateInstructions();
 }
 
+function adjustLayoutForMobile() {
+  if (
+    window.matchMedia("(max-width: 812px) and (orientation: landscape)").matches
+  ) {
+    const gameContainer = document.getElementById("game-container");
+    const screen = document.getElementById("screen");
+    const controls = document.getElementById("controls");
+
+    const availableHeight = window.innerHeight;
+    const controlsHeight = controls.offsetHeight;
+    const bannerHeight = document.getElementById("banner").offsetHeight;
+
+    screen.style.maxHeight = `${
+      availableHeight - controlsHeight - bannerHeight - 40
+    }px`; // Adjusted for padding
+
+    // Ensure the container is scrollable
+    gameContainer.style.overflowY = "auto";
+
+    // Scroll to show the screen fully
+    screen.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 function startUserAudio() {
   let audioCtx = getAudioContext();
   if (audioCtx.state !== "running") {
