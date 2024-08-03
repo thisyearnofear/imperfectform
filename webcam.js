@@ -28,8 +28,7 @@ let firstPushUpDetected = false;
 let typewriterUsed = false; // Flag to track if the typewriter effect has been used
 
 function setup() {
-  let canvas = createCanvas(640, 480);
-  canvas.parent("canvasContainer");
+  createCanvas(640, 480).parent("canvasContainer");
 
   let startButton = select("#startButton");
   startButton.mousePressed(startDetection);
@@ -63,23 +62,6 @@ function setup() {
     "PUSHUPS 💪",
     "Click RESET To Proceed",
   ]);
-  windowResized();
-
-  document.addEventListener("fullscreenchange", () => {
-    const screen = document.getElementById("screen");
-    const canvasContainer = document.getElementById("canvasContainer");
-    const canvas = document.querySelector("#canvasContainer canvas");
-    const video = document.querySelector("#canvasContainer video");
-
-    if (!document.fullscreenElement) {
-      screen.classList.remove("fullscreen");
-      canvasContainer.classList.remove("fullscreen");
-      if (canvas) canvas.classList.remove("fullscreen");
-      if (video) video.classList.remove("fullscreen");
-    }
-  });
-
-  document.addEventListener("fullscreenchange", windowResized);
 }
 
 function windowResized() {
@@ -318,6 +300,7 @@ function adjustLayoutForMobile() {
 function toggleFullScreen() {
   const screen = document.getElementById("screen");
   const canvasContainer = document.getElementById("canvasContainer");
+  const canvas = document.querySelector("#canvasContainer canvas");
   const video = document.querySelector("#canvasContainer video");
 
   if (!document.fullscreenElement) {
@@ -328,16 +311,14 @@ function toggleFullScreen() {
     });
     screen.classList.add("fullscreen");
     canvasContainer.classList.add("fullscreen");
-    video.classList.add("fullscreen");
+    if (canvas) canvas.classList.add("fullscreen");
+    if (video) video.classList.add("fullscreen");
   } else {
-    document.exitFullscreen().catch((err) => {
-      alert(
-        `Error attempting to exit full-screen mode: ${err.message} (${err.name})`
-      );
-    });
+    document.exitFullscreen();
     screen.classList.remove("fullscreen");
     canvasContainer.classList.remove("fullscreen");
-    video.classList.remove("fullscreen");
+    if (canvas) canvas.classList.remove("fullscreen");
+    if (video) video.classList.remove("fullscreen");
   }
 }
 
