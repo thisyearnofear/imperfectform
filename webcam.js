@@ -64,11 +64,6 @@ function setup() {
   ]);
 }
 
-function windowResized() {
-  const canvasContainer = select("#canvasContainer");
-  resizeCanvas(canvasContainer.width, canvasContainer.height);
-}
-
 function typeWriterEffect(element, text, callback) {
   let i = 0;
   let j = 0;
@@ -284,58 +279,39 @@ function checkOrientation() {
 }
 
 function adjustLayoutForMobile() {
+  const gameContainer = document.getElementById("game-container");
+  const screen = document.getElementById("screen");
+  const controls = document.getElementById("controls");
+  const arrow = document.querySelector(".gold-medal-arrow"); // Assuming this is the correct selector
+
+  const availableHeight = window.innerHeight;
+  const controlsHeight = controls.offsetHeight;
+  const bannerHeight = document.getElementById("banner").offsetHeight;
+
+  screen.style.maxHeight = `${
+    availableHeight - controlsHeight - bannerHeight - 40
+  }px`;
+
+  // Ensure the container is scrollable
+  gameContainer.style.overflowY = "auto";
+
+  // Scroll to show the screen fully
+  screen.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // Hide the gold arrow in landscape mode on mobile
+  // sourcery skip: merge-else-if
   if (
     window.matchMedia("(max-width: 768px) and (orientation: landscape)").matches
   ) {
-    const gameContainer = document.getElementById("game-container");
-    const screen = document.getElementById("screen");
-    const controls = document.getElementById("controls");
-
-    const availableHeight = window.innerHeight;
-    const controlsHeight = controls.offsetHeight;
-    const bannerHeight = document.getElementById("banner").offsetHeight;
-
-    screen.style.maxHeight = `${
-      availableHeight - controlsHeight - bannerHeight - 40
-    }px`; // Adjusted for padding
-
-    // Ensure the container is scrollable
-    gameContainer.style.overflowY = "auto";
-
-    // Scroll to show the screen fully
-    screen.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-}
-
-function toggleFullScreen() {
-  const screen = document.getElementById("screen");
-  const canvasContainer = document.getElementById("canvasContainer");
-  const canvas = document.querySelector("#canvasContainer canvas");
-  const video = document.querySelector("#canvasContainer video");
-
-  if (!document.fullscreenElement) {
-    screen.requestFullscreen().catch((err) => {
-      alert(
-        `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-      );
-    });
-    screen.classList.add("fullscreen");
-    canvasContainer.classList.add("fullscreen");
-    if (canvas) canvas.classList.add("fullscreen");
-    if (video) video.classList.add("fullscreen");
+    if (arrow) arrow.style.display = "none";
   } else {
-    document.exitFullscreen();
-    screen.classList.remove("fullscreen");
-    canvasContainer.classList.remove("fullscreen");
-    if (canvas) canvas.classList.remove("fullscreen");
-    if (video) video.classList.remove("fullscreen");
+    if (arrow) arrow.style.display = "block"; // Show arrow in other cases
   }
 }
 
-function dismissOrientationMessage() {
-  document.getElementById("orientationMessage").style.display = "none";
-  document.getElementById("game-container").style.display = "flex";
-}
+// Check orientation on load and resize
+window.addEventListener("load", adjustLayoutForMobile);
+window.addEventListener("resize", adjustLayoutForMobile);
 
 // Check orientation on load
 window.addEventListener("load", checkOrientation);
@@ -435,29 +411,32 @@ function startUserAudio() {
 }
 
 async function initDetector() {
+  // Preferred configuration with SINGLEPOSE_THUNDER
   detectorConfig = {
-    modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+    modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER,
   };
+
   try {
-    // Try to create a detector with WebGL
+    // Try to create a detector with WebGL and SINGLEPOSE_THUNDER
     detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
       detectorConfig
     );
-  } catch (error) {
-    console.warn("WebGL initialization failed, trying CPU fallback.");
+  } catch (webglError) {
+    console.warn(
+      "WebGL initialization failed with SINGLEPOSE_THUNDER, trying SINGLEPOSE_LIGHTNING on CPU."
+    );
     try {
-      // If WebGL fails, try to use CPU backend
+      // If WebGL fails, switch to CPU backend and use SINGLEPOSE_LIGHTNING
       await tf.setBackend("cpu");
       detector = await poseDetection.createDetector(
         poseDetection.SupportedModels.MoveNet,
         {
-          ...detectorConfig,
           modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
         }
       );
     } catch (cpuError) {
-      console.error("Error initializing detector:", cpuError);
+      console.error("Error initializing detector with CPU fallback:", cpuError);
       alert(
         "Unable to initialize pose detection. Please try a different browser or device."
       );
