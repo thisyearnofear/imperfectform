@@ -7,17 +7,20 @@ html {
   font-family: "Press Start 2P", cursive;
   background-color: #000;
   color: #fff;
-  overflow: hidden;
+  overflow-y: auto; /* Allow vertical scrolling */
+  min-height: 100vh;
 }
 
 /* Layout */
 #game-container {
   display: flex;
   flex-direction: column;
+  align-items: center; /* Center content horizontally */
   min-height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  overflow-y: auto;
+  overflow-y: auto; /* Allow vertical scrolling within the container */
+  justify-content: center; /* Added to vertically center all content */
 }
 
 /* Banner */
@@ -391,37 +394,45 @@ button:hover {
   transform: translateX(-50%);
 }
 
-/* Fullscreen */
-#game-container.fullscreen {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-#screen.fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
+/* Leaderboard */
+.leaderboard-container {
   width: 100%;
-  height: 100%;
-  z-index: 1000;
+  max-width: 640px;
+  margin: 20px 0;
   background-color: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  border: 4px solid #fff;
+  box-shadow: 0 0 10px #fcb131;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-#canvasContainer.fullscreen {
-  width: 100%;
-  height: 100%;
+.leaderboard-container h2 {
+  color: #fcb131;
+  text-align: center;
+  margin-bottom: 15px;
 }
 
-#canvasContainer.fullscreen canvas,
-#canvasContainer.fullscreen video {
+#leaderboardTable {
   width: 100%;
-  height: 100%;
-  object-fit: cover; /* Ensure the video covers the entire container */
+  border-collapse: collapse;
+}
+
+#leaderboardTable th,
+#leaderboardTable td {
+  border: 1px solid #fcb131;
+  padding: 10px;
+  text-align: center;
+  color: #fff;
+}
+
+#leaderboardTable th {
+  background-color: #fcb131;
+  color: #000;
+}
+
+#leaderboardTable tr:nth-child(even) {
+  background-color: rgba(252, 177, 49, 0.1);
 }
 
 /* Orientation message */

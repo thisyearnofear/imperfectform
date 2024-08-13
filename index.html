@@ -38,15 +38,16 @@
       src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"
       defer
     ></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.0/dist/ethers.umd.min.js"></script>
+    <script src="webcam.js" defer></script>
+    <script src="leaderboard.js" type="module" defer></script>
   </head>
   <body>
     <div id="orientationMessage" class="orientation-message">
       <p>
         Please rotate your device to landscape mode for a better experience.
       </p>
-      <button id="dismissOrientation" aria-label="Dismiss orientation message">
-        Dismiss
-      </button>
     </div>
     <div id="game-container">
       <div id="banner">
@@ -83,6 +84,21 @@
         <button id="startButton" aria-label="Start game">START</button>
         <button id="stopButton" aria-label="Stop game">STOP</button>
         <button id="resetButton" aria-label="Reset game">RESET</button>
+      </div>
+      <div id="leaderboardContainer" class="leaderboard-container">
+        <h2>Leaderboard</h2>
+        <table id="leaderboardTable">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Address</th>
+              <th>Pushups</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Leaderboard entries will be inserted here -->
+          </tbody>
+        </table>
       </div>
     </div>
     <!-- Modal Dialog -->
@@ -123,8 +139,5 @@
         your browser settings.
       </p>
     </noscript>
-    <script src="webcam.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
-    <script src="leaderboard.js" defer></script>
   </body>
 </html>

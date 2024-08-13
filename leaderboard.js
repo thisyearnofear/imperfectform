@@ -167,17 +167,31 @@ const contractABI = [
     type: "function",
   },
 ];
+
 async function initWeb3() {
   if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
+    web3 = new window.Web3(window.ethereum); // Access web3 from window object
+    try {
+      // Request account access
+      await window.ethereum.enable();
+    } catch (error) {
+      console.error("User denied account access");
+    }
   } else if (window.web3) {
-    web3 = new Web3(window.web3.currentProvider);
+    web3 = new window.Web3(window.web3.currentProvider); // Access web3 from window object
   } else {
+    // Non-dapp browsers fallback
     console.log(
-      "Non-Ethereum browser detected. You should consider trying MetaMask!"
+      "Non-Ethereum browser detected. You should consider trying Rabby!"
     );
-    web3 = new Web3(new Web3.providers.HttpProvider(amoyRpcUrl));
+    web3 = new window.Web3(new window.Web3.providers.HttpProvider(amoyRpcUrl)); // Access web3 from window object
   }
+
+  // Initialize the contract
+  initContract();
+
+  // Update the leaderboard
+  updateLeaderboard();
 }
 
 function initContract() {
@@ -210,9 +224,9 @@ async function connectWallet() {
         "Failed to connect wallet. Please try again.";
     }
   } else {
-    console.log("Please install MetaMask!");
+    console.log("Please install Rabby!");
     document.getElementById("submissionStatus").textContent =
-      "Please install MetaMask to submit your score.";
+      "Please install Rabby to submit your score.";
   }
 }
 
@@ -226,7 +240,7 @@ async function checkNetwork() {
         params: [{ chainId: "0x13882" }], // 80002 in hexadecimal
       });
     } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask.
+      // This error code indicates that the chain has not been added to Wallet.
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
@@ -308,6 +322,83 @@ async function promptFee() {
   }
 }
 
+async function updateLeaderboard() {
+  if (!leaderboardContract) {
+    console.error("Leaderboard contract not initialized");
+    return;
+  }
+
+  try {
+    // Fetch all entries from the contract
+    const leaderboardData = await leaderboardContract.methods
+      .getDailyLeaderboard()
+      .call();
+
+    // Update the leaderboard display
+    const leaderboardBody = document.getElementById("leaderboardBody");
+    leaderboardBody.innerHTML = ""; // Clear existing entries
+
+    for (let i = 0; i < leaderboardData.length; i++) {
+      const entry = leaderboardData[i];
+      if (entry.user !== "0x0000000000000000000000000000000000000000") {
+        const ensName = await resolveENSName(entry.user);
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${ensName || shortenAddress(entry.user)}</td>
+            <td>${entry.score}</td>
+          `;
+        leaderboardBody.appendChild(row);
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching leaderboard data:", error);
+  }
+}
+
+async function resolveENSName(address) {
+  try {
+    const provider = new window.ethers.providers.Web3Provider(window.ethereum);
+    const network = await provider.getNetwork();
+
+    // Check if the network supports ENS
+    if (
+      network.name !== "homestead" &&
+      network.name !== "ropsten" &&
+      network.name !== "rinkeby" &&
+      network.name !== "goerli" &&
+      network.name !== "kovan"
+    ) {
+      throw new Error("Network does not support ENS");
+    }
+
+    // sourcery skip: inline-immediately-returned-variable
+    const ensName = await provider.lookupAddress(address);
+    return ensName;
+  } catch (error) {
+    console.error("Error resolving ENS name using ethers.js:", error);
+    // Fallback to ENS Data API
+    return await resolveENSNameFallback(address);
+  }
+}
+
+async function resolveENSNameFallback(address) {
+  try {
+    const response = await fetch(`https://api.ensdata.net/${address}`);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    const data = await response.json();
+    return data.ens_primary || null;
+  } catch (error) {
+    console.error("Error resolving ENS name using ENS Data API:", error);
+    return null;
+  }
+}
+function shortenAddress(address) {
+  return `${address.substr(0, 6)}...${address.substr(-4)}`;
+}
+
 async function submitScore() {
   if (!userAddress || !leaderboardContract) {
     console.error("Wallet not connected or contract not initialized");
@@ -342,6 +433,9 @@ async function submitScore() {
 
     document.getElementById("submissionStatus").textContent =
       "Score submitted successfully!";
+
+    // Update the leaderboard after successful submission
+    await updateLeaderboard();
   } catch (error) {
     console.error("Error submitting score:", error);
     document.getElementById("submissionStatus").textContent =
