@@ -2,8 +2,9 @@ let web3;
 let userAddress;
 let leaderboardContract;
 const amoyRpcUrl = "https://rpc-amoy.polygon.technology/";
+const amoyChainId = 80002;
 
-const contractAddress = "0x802C3a9953C4fcEC807eF1B464F7b15310C2396b";
+const contractAddress = "0x21F6514fdabaD6aB9cB227ddE69A1c34C9cF9014";
 const contractABI = [
   {
     inputs: [
@@ -170,39 +171,34 @@ const contractABI = [
 
 async function initWeb3() {
   if (window.ethereum) {
-    web3 = new window.Web3(window.ethereum); // Access web3 from window object
-    try {
-      // Request account access
-      await window.ethereum.enable();
-    } catch (error) {
-      console.error("User denied account access");
-    }
+    web3 = new Web3(window.ethereum);
   } else if (window.web3) {
-    web3 = new window.Web3(window.web3.currentProvider); // Access web3 from window object
+    web3 = new Web3(window.web3.currentProvider);
   } else {
-    // Non-dapp browsers fallback
     console.log(
       "Non-Ethereum browser detected. You should consider trying Rabby!"
     );
-    web3 = new window.Web3(new window.Web3.providers.HttpProvider(amoyRpcUrl)); // Access web3 from window object
+    web3 = new Web3(new Web3.providers.HttpProvider(amoyRpcUrl));
   }
-
-  // Initialize the contract
   initContract();
-
-  // Update the leaderboard
   updateLeaderboard();
 }
 
 function initContract() {
-  leaderboardContract = new web3.eth.Contract(contractABI, contractAddress);
+  if (web3) {
+    leaderboardContract = new web3.eth.Contract(contractABI, contractAddress);
+    console.log("Contract initialized:", leaderboardContract);
+  } else {
+    console.error("Web3 not initialized");
+  }
 }
 
 async function connectWallet() {
   if (typeof window.ethereum !== "undefined") {
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
-      userAddress = (await web3.eth.getAccounts())[0];
+      const accounts = await web3.eth.getAccounts();
+      userAddress = accounts[0];
       console.log("Connected to wallet. User address:", userAddress);
 
       const isCorrectNetwork = await checkNetwork();
@@ -216,7 +212,6 @@ async function connectWallet() {
       document.getElementById("submitScoreButton").style.display =
         "inline-block";
 
-      initContract();
       await checkBalance();
     } catch (error) {
       console.error("Failed to connect to wallet:", error);
@@ -240,7 +235,6 @@ async function checkNetwork() {
         params: [{ chainId: "0x13882" }], // 80002 in hexadecimal
       });
     } catch (switchError) {
-      // This error code indicates that the chain has not been added to Wallet.
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
@@ -305,7 +299,6 @@ async function promptFee() {
     const minimumFee = await leaderboardContract.methods.MINIMUM_FEE().call();
     const minimumFeeInMatic = web3.utils.fromWei(minimumFee, "ether");
 
-    // Prompt the user about the fee
     return new Promise((resolve, reject) => {
       const userConfirmed = confirm(
         `Submitting your score will incur a fee of ${minimumFeeInMatic} MATIC. Do you want to proceed?`
@@ -323,18 +316,22 @@ async function promptFee() {
 }
 
 async function updateLeaderboard() {
+  const loadButton = document.getElementById("loadLeaderboardButton");
+  loadButton.textContent = "Loading...";
+  loadButton.disabled = true;
+
   if (!leaderboardContract) {
-    console.error("Leaderboard contract not initialized");
+    console.log("Contract not initialized.");
+    loadButton.textContent = "Load";
+    loadButton.disabled = false;
     return;
   }
-
   try {
-    // Fetch all entries from the contract
     const leaderboardData = await leaderboardContract.methods
       .getDailyLeaderboard()
       .call();
+    console.log("Leaderboard data:", leaderboardData);
 
-    // Update the leaderboard display
     const leaderboardBody = document.getElementById("leaderboardBody");
     leaderboardBody.innerHTML = ""; // Clear existing entries
 
@@ -353,6 +350,12 @@ async function updateLeaderboard() {
     }
   } catch (error) {
     console.error("Error fetching leaderboard data:", error);
+    document.getElementById(
+      "leaderboardBody"
+    ).innerHTML = `<tr><td colspan="3">Error loading leaderboard. Please try again later.</td></tr>`;
+  } finally {
+    loadButton.textContent = "Load";
+    loadButton.disabled = false;
   }
 }
 
@@ -361,7 +364,6 @@ async function resolveENSName(address) {
     const provider = new window.ethers.providers.Web3Provider(window.ethereum);
     const network = await provider.getNetwork();
 
-    // Check if the network supports ENS
     if (
       network.name !== "homestead" &&
       network.name !== "ropsten" &&
@@ -377,7 +379,6 @@ async function resolveENSName(address) {
     return ensName;
   } catch (error) {
     console.error("Error resolving ENS name using ethers.js:", error);
-    // Fallback to ENS Data API
     return await resolveENSNameFallback(address);
   }
 }
@@ -395,13 +396,20 @@ async function resolveENSNameFallback(address) {
     return null;
   }
 }
+
 function shortenAddress(address) {
   return `${address.substr(0, 6)}...${address.substr(-4)}`;
 }
 
 async function submitScore() {
+  if (!userAddress) {
+    await connectWallet();
+  }
+
   if (!userAddress || !leaderboardContract) {
     console.error("Wallet not connected or contract not initialized");
+    document.getElementById("submissionStatus").textContent =
+      "Please connect your wallet and try again.";
     return;
   }
 
@@ -412,9 +420,9 @@ async function submitScore() {
     return;
   }
 
-  const score = reps;
+  const score = window.reps || 0; // Ensure reps is defined globally
+  console.log("Submitting score:", score); // Debugging step
 
-  // Prompt the user about the fee
   const userConfirmed = await promptFee();
   if (!userConfirmed) {
     document.getElementById("submissionStatus").textContent =
@@ -424,17 +432,18 @@ async function submitScore() {
 
   try {
     const minimumFee = await leaderboardContract.methods.MINIMUM_FEE().call();
+    console.log("Minimum fee:", minimumFee); // Debugging step
 
-    // Sending transaction with minimum fee required
-    await leaderboardContract.methods.addScore(score).send({
+    const result = await leaderboardContract.methods.addScore(score).send({
       from: userAddress,
-      value: minimumFee, // Use the fee directly
+      value: minimumFee,
     });
+
+    console.log("Transaction result:", result);
 
     document.getElementById("submissionStatus").textContent =
       "Score submitted successfully!";
 
-    // Update the leaderboard after successful submission
     await updateLeaderboard();
   } catch (error) {
     console.error("Error submitting score:", error);
@@ -455,3 +464,6 @@ document
 document
   .getElementById("submitScoreButton")
   .addEventListener("click", submitScore);
+document
+  .getElementById("loadLeaderboardButton")
+  .addEventListener("click", updateLeaderboard);

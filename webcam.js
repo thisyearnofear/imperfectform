@@ -418,6 +418,8 @@ async function initDetector() {
 
   try {
     // Try to create a detector with WebGL and SINGLEPOSE_THUNDER
+    await tf.setBackend("webgl");
+    await tf.ready();
     detector = await poseDetection.createDetector(
       poseDetection.SupportedModels.MoveNet,
       detectorConfig
@@ -429,6 +431,7 @@ async function initDetector() {
     try {
       // If WebGL fails, switch to CPU backend and use SINGLEPOSE_LIGHTNING
       await tf.setBackend("cpu");
+      await tf.ready();
       detector = await poseDetection.createDetector(
         poseDetection.SupportedModels.MoveNet,
         {
@@ -437,23 +440,73 @@ async function initDetector() {
       );
     } catch (cpuError) {
       console.error("Error initializing detector with CPU fallback:", cpuError);
-      alert(
-        "Unable to initialize pose detection. Please try a different browser or device."
-      );
-      return;
+      console.warn("Trying BlazePose as a fallback.");
+      await initBlazePose(); // Fallback to BlazePose
     }
   }
 
-  detectorReady = true;
-  hideLoadingScreen();
-  getPoses();
+  if (detector) {
+    detectorReady = true;
+    hideLoadingScreen();
+    getPoses();
+  }
 }
 
+async function initBlazePose() {
+  try {
+    const pose = new window.Pose({
+      locateFile: (file) =>
+        `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`,
+    });
+
+    pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      enableSegmentation: false,
+      smoothSegmentation: false,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+
+    pose.onResults(onBlazePoseResults);
+
+    detector = pose;
+    detectorReady = true;
+    hideLoadingScreen();
+    getPosesWithBlazePose();
+  } catch (error) {
+    console.error("Error initializing BlazePose:", error);
+    alert(
+      "Unable to initialize pose detection. Please try a different browser or device."
+    );
+  }
+}
+
+function onBlazePoseResults(results) {
+  poses = results.poseLandmarks ? [{ keypoints: results.poseLandmarks }] : [];
+}
+
+async function getPosesWithBlazePose() {
+  if (detectorReady && videoInitialized) {
+    try {
+      await detector.send({ image: video.elt });
+      setTimeout(getPosesWithBlazePose, 0);
+    } catch (error) {
+      console.error("Error estimating poses with BlazePose:", error);
+    }
+  }
+}
+
+// Modify the existing getPoses function to handle both MoveNet and BlazePose
 async function getPoses() {
   if (detectorReady && videoInitialized) {
     try {
-      poses = await detector.estimatePoses(video.elt);
-      setTimeout(getPoses, 0);
+      if (detector instanceof window.Pose) {
+        await getPosesWithBlazePose();
+      } else {
+        poses = await detector.estimatePoses(video.elt);
+        setTimeout(getPoses, 0);
+      }
     } catch (error) {
       console.error("Error estimating poses:", error);
     }
@@ -641,19 +694,20 @@ function speak(text, voiceName = "Google UK English Male") {
 function inUpPosition() {
   if (elbowAngle > 170 && elbowAngle < 200 && downPosition) {
     reps += 1;
+    window.reps = reps; // Update window.reps
     speak(reps.toString());
 
     // Add encouragement statements
     if (reps === 5) {
-      speak("Halfway to the bronze medal!");
+      speak("You got this!");
     } else if (reps === 10) {
       speak("Great job! Bronze medal!");
     } else if (reps === 15) {
-      speak("Halfway to the silver medal!");
+      speak("Wow!");
     } else if (reps === 20) {
       speak("Awesome! Silver medal!");
     } else if (reps === 25) {
-      speak("Halfway to the gold medal!");
+      speak("Incredible!");
     } else if (reps === 30) {
       speak("Fantastic! Gold medal!");
     }
