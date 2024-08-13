@@ -110,6 +110,14 @@
         <div class="share-button">
           <a href="#" id="shareTwitter" target="_blank">Share on Twitter</a>
         </div>
+        <div class="blockchain-submission">
+          <p>Submit score to leaderboard:</p>
+          <button id="connectWalletButton">Connect Wallet</button>
+          <button id="submitScoreButton" style="display: none">
+            Submit Score
+          </button>
+          <p id="submissionStatus"></p>
+        </div>
         <p>Click RESET to start again</p>
       </div>
     </div>
@@ -120,5 +128,7 @@
       </p>
     </noscript>
     <script src="webcam.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="leaderboard.js" defer></script>
   </body>
 </html>

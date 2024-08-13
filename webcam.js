@@ -111,9 +111,19 @@ function stylizeInstructions() {
 }
 
 function addGoldMedalArrow() {
-  const arrow = createDiv("");
-  arrow.class("gold-medal-arrow");
-  arrow.parent("instructions");
+  // Check if the device is in landscape mode and is a mobile device
+  if (
+    window.matchMedia("(max-width: 768px) and (orientation: landscape)").matches
+  ) {
+    // Do not add the arrow if in landscape mode on a mobile device
+    console.log(
+      "Gold medal arrow not added due to landscape orientation on mobile."
+    );
+  } else {
+    const arrow = createDiv("");
+    arrow.class("gold-medal-arrow");
+    arrow.parent("instructions");
+  }
 }
 
 function showInstructions() {
@@ -333,15 +343,48 @@ window.addEventListener("load", checkOrientation);
 // Check orientation on resize
 window.addEventListener("resize", checkOrientation);
 
-// Toggle full-screen mode
-document
-  .getElementById("toggleFullScreen")
-  .addEventListener("click", toggleFullScreen);
+function showSummary() {
+  const summaryModal = select("#summaryModal");
+  const summaryText = select("#summaryText");
+  const medal = select("#medal");
 
-// Dismiss orientation message
-document
-  .getElementById("dismissOrientation")
-  .addEventListener("click", dismissOrientationMessage);
+  // Calculate time spent
+  const timeSpent = 120 - timeLeft;
+  const formattedTimeSpent = formatTime(timeSpent);
+
+  // Determine medal based on reps
+  let medalText = "";
+  if (reps >= 30) {
+    medalText = "🏅 Gold Medal! Excellent job!";
+  } else if (reps >= 20) {
+    medalText = "🥈 Silver Medal! Great effort!";
+  } else if (reps >= 10) {
+    medalText = "🥉 Bronze Medal! Good work!";
+  } else {
+    medalText = "Practice makes...less imperfect!";
+  }
+
+  // Set summary text
+  summaryText.html(`
+    <p>Push-Ups Completed: ${reps}</p>
+    <p>Time Spent: ${formattedTimeSpent}</p>
+    <p>${medalText}</p>
+    <p>"Health is wealth!"</p>
+  `);
+
+  // Reset blockchain submission UI
+  document.getElementById("connectWalletButton").style.display = "inline-block";
+  document.getElementById("submitScoreButton").style.display = "none";
+  document.getElementById("submissionStatus").textContent = "";
+
+  // Show the modal
+  summaryModal.style("display", "block");
+
+  // Close button functionality
+  select(".close-button").mousePressed(() => {
+    summaryModal.style("display", "none");
+  });
+}
 
 function stopDetection() {
   if (video) {
@@ -582,7 +625,7 @@ function showSummary() {
   } else if (reps >= 10) {
     medalText = "🥉 Bronze Medal! Good work!";
   } else {
-    medalText = "Keep practicing and you'll get there!";
+    medalText = "Practice makes...less imperfect!";
   }
 
   // Set summary text
@@ -590,7 +633,7 @@ function showSummary() {
     <p>Push-Ups Completed: ${reps}</p>
     <p>Time Spent: ${formattedTimeSpent}</p>
     <p>${medalText}</p>
-    <p>Stay consistent, stay healthy, and keep pushing your limits!</p>
+    <p>"Health is wealth!"</p>
   `);
 
   // Generate Twitter share link

@@ -306,6 +306,33 @@ button:hover {
   margin-bottom: 20px;
 }
 
+.blockchain-submission {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#connectWalletButton,
+#submitScoreButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+#connectWalletButton:hover,
+#submitScoreButton:hover {
+  background-color: #45a049;
+}
+
+#submissionStatus {
+  margin-top: 10px;
+  font-style: italic;
+}
+
 /* Miscellaneous */
 .built-by {
   text-align: center;
