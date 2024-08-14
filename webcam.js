@@ -284,31 +284,31 @@ function adjustLayoutForMobile() {
   const gameContainer = document.getElementById("game-container");
   const screen = document.getElementById("screen");
   const controls = document.getElementById("controls");
-  const arrow = document.querySelector(".gold-medal-arrow"); // Assuming this is the correct selector
+  const banner = document.getElementById("banner");
+  const leaderboardContainer = document.getElementById("leaderboardContainer");
 
   const availableHeight = window.innerHeight;
   const controlsHeight = controls.offsetHeight;
-  const bannerHeight = document.getElementById("banner").offsetHeight;
 
-  screen.style.maxHeight = `${
-    availableHeight - controlsHeight - bannerHeight - 40
-  }px`;
+  if (
+    window.matchMedia("(max-width: 768px) and (orientation: landscape)").matches
+  ) {
+    // Hide banner and leaderboard in landscape mode
+    if (banner) banner.style.display = "none";
+    if (leaderboardContainer) leaderboardContainer.style.display = "none";
+  } else {
+    // Show banner and leaderboard in portrait mode
+    if (banner) banner.style.display = "flex";
+    if (leaderboardContainer) leaderboardContainer.style.display = "block";
+  }
+
+  screen.style.maxHeight = `${availableHeight - controlsHeight}px`;
 
   // Ensure the container is scrollable
   gameContainer.style.overflowY = "auto";
 
   // Scroll to show the screen fully
   screen.scrollIntoView({ behavior: "smooth", block: "start" });
-
-  // Hide the gold arrow in landscape mode on mobile
-  // sourcery skip: merge-else-if
-  if (
-    window.matchMedia("(max-width: 768px) and (orientation: landscape)").matches
-  ) {
-    if (arrow) arrow.style.display = "none";
-  } else {
-    if (arrow) arrow.style.display = "block"; // Show arrow in other cases
-  }
 }
 
 // Check orientation on load and resize
@@ -358,18 +358,33 @@ function showSummary() {
   summaryModal.style("display", "block");
 
   // Close button functionality
-  select(".close-button").mousePressed(() => {
-    summaryModal.style("display", "none");
+  const closeButton = select(".close-button");
+  if (closeButton) {
+    closeButton.mousePressed(() => {
+      summaryModal.style("display", "none");
+    });
+  } else {
+    console.error("Close button not found");
+  }
+
+  // Twitter share button functionality
+  const shareTwitterButton = document.getElementById("shareTwitterButton");
+  shareTwitterButton.addEventListener("click", () => {
+    const tweetText = `I just pumped ${reps} push-ups in ${formattedTimeSpent} #OnchainOlympics #ImperfectForm`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      tweetText
+    )}`;
+    window.open(tweetUrl, "_blank");
   });
 }
 
 function showPositiveMessage() {
   const positiveMessages = [
-    "Great job on your workout! Regular exercise can boost your mood and energy levels.",
-    "Awesome effort! Consistent exercise helps improve your cardiovascular health.",
-    "Well done! Exercise strengthens your muscles and bones, improving overall fitness.",
-    "Fantastic work! Regular physical activity can help reduce stress and anxiety.",
-    "Excellent! Exercise can improve your sleep quality and cognitive function.",
+    "Smashed It!",
+    "Shoutout to you for showing up",
+    "Consistency + Effort = Awesome Fitness",
+    "Exercise helps reduce stress & anxiety, improving sleep & cognition.",
+    "Strong muscles, killer cardio, age like a champion.",
   ];
 
   const randomMessage =
@@ -380,8 +395,8 @@ function showPositiveMessage() {
   messageContainer.class("positive-message");
   messageContainer.html(`
     <p>${randomMessage}</p>
-    <p>Keep up the great work and stay consistent!</p>
-    <p>Click RESET to see instructions or START to begin again.</p>
+    <p>Thanks for Playing!</p>
+    <p>Click RESET to see instructions.</p>
   `);
 }
 
@@ -675,51 +690,6 @@ function updateBackAngle() {
       backWarningGiven = true;
     }
   }
-}
-
-function showSummary() {
-  const summaryModal = select("#summaryModal");
-  const summaryText = select("#summaryText");
-  const medal = select("#medal");
-
-  // Calculate time spent
-  const timeSpent = 120 - timeLeft;
-  const formattedTimeSpent = formatTime(timeSpent);
-
-  // Determine medal based on reps
-  let medalText = "";
-  if (reps >= 30) {
-    medalText = "🏅 Gold Medal! Excellent job!";
-  } else if (reps >= 20) {
-    medalText = "🥈 Silver Medal! Great effort!";
-  } else if (reps >= 10) {
-    medalText = "🥉 Bronze Medal! Good work!";
-  } else {
-    medalText = "Practice makes...less imperfect!";
-  }
-
-  // Set summary text
-  summaryText.html(`
-    <p>Push-Ups Completed: ${reps}</p>
-    <p>Time Spent: ${formattedTimeSpent}</p>
-    <p>${medalText}</p>
-    <p>"Health is wealth!"</p>
-  `);
-
-  // Generate Twitter share link
-  const shareText = `Onchain Olympics\nPUSHUPS challenge\nI completed ${reps} reps in ${formattedTimeSpent} 💪\n\nimperfectform.lol\n'marginal gains in asymptote towards perfect form'\n\nBuilt by @papajimjams\nFarcaster: https://warpcast.com/papa\nLens: https://hey.xyz/u/papajams\n`;
-  const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-    shareText
-  )}`;
-  select("#shareTwitter").attribute("href", shareUrl);
-
-  // Show the modal
-  summaryModal.style("display", "block");
-
-  // Close button functionality
-  select(".close-button").mousePressed(() => {
-    summaryModal.style("display", "none");
-  });
 }
 
 function speak(text, voiceName = "Google UK English Male") {

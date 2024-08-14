@@ -335,18 +335,33 @@ async function updateLeaderboard() {
     const leaderboardBody = document.getElementById("leaderboardBody");
     leaderboardBody.innerHTML = ""; // Clear existing entries
 
-    for (let i = 0; i < leaderboardData.length; i++) {
-      const entry = leaderboardData[i];
+    // Aggregate scores by address
+    const aggregatedScores = leaderboardData.reduce((acc, entry) => {
       if (entry.user !== "0x0000000000000000000000000000000000000000") {
-        const ensName = await resolveENSName(entry.user);
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${i + 1}</td>
-            <td>${ensName || shortenAddress(entry.user)}</td>
-            <td>${entry.score}</td>
-          `;
-        leaderboardBody.appendChild(row);
+        if (!acc[entry.user]) {
+          acc[entry.user] = 0;
+        }
+        acc[entry.user] += parseInt(entry.score, 10);
       }
+      return acc;
+    }, {});
+
+    // Convert aggregated scores to an array and sort by score
+    const sortedScores = Object.entries(aggregatedScores)
+      .map(([user, score]) => ({ user, score }))
+      .sort((a, b) => b.score - a.score);
+
+    // Display the aggregated and sorted scores
+    for (let i = 0; i < sortedScores.length; i++) {
+      const entry = sortedScores[i];
+      const ensName = await resolveENSName(entry.user);
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${i + 1}</td>
+        <td>${ensName || shortenAddress(entry.user)}</td>
+        <td>${entry.score}</td>
+      `;
+      leaderboardBody.appendChild(row);
     }
   } catch (error) {
     console.error("Error fetching leaderboard data:", error);
@@ -358,7 +373,6 @@ async function updateLeaderboard() {
     loadButton.disabled = false;
   }
 }
-
 async function resolveENSName(address) {
   try {
     const provider = new window.ethers.providers.Web3Provider(window.ethereum);

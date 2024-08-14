@@ -117,13 +117,14 @@ h1 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: #000; /* Solid black background */
   color: #fcb131;
   font-size: 16px;
   line-height: 1.5;
   text-align: center;
   padding: 20px;
   box-sizing: border-box;
+  z-index: 1000; /* Ensure it is on top of other elements */
 }
 
 .positive-message p {
@@ -242,6 +243,21 @@ button:hover {
 #toggleFullScreen {
   position: relative;
   overflow: hidden; /* Ensure the overlay does not spill outside the button */
+}
+
+.twitter-button {
+  background-color: #1da1f2; /* Twitter blue */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.twitter-button:hover {
+  background-color: #0d8ddb; /* Darker blue on hover */
 }
 
 .coming-soon {
@@ -497,7 +513,7 @@ button:hover {
   align-items: center;
   font-size: 10px; /* Smaller font size for the overlay text */
   text-transform: uppercase;
-  pointer-events: none; /* Prevents interaction with the overlay */
+  pointer-events: auto; /* Allow interactions with the overlay */
 }
 
 .dismiss-button {
@@ -607,26 +623,9 @@ button:hover {
 
 /* Landscape-specific styles */
 @media (max-width: 768px) and (orientation: landscape) {
-  #game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh; /* Ensure it takes up the full viewport height */
-    overflow-y: auto; /* Allow vertical scrolling */
-  }
-
-  #banner {
-    flex-direction: column;
-    margin-bottom: 10px;
-  }
-
-  .olympic-rings {
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
-
-  h1 {
-    font-size: 20px;
+  #banner,
+  #leaderboardContainer {
+    display: none;
   }
 
   #screen {
