@@ -57,7 +57,9 @@ function setup() {
   // Show initial welcome message
   showView("#welcomeMessage");
   typeWriterEffect(select("#welcomeMessage"), [
-    "Welcome To The Onchain Olympics",
+    "Welcome To Imperfect Form",
+    "Where Practice Makes",
+    "...Less Imperfect!",
     "First Challenge",
     "PUSHUPS 💪",
     "Click RESET To Proceed",
@@ -345,7 +347,6 @@ function showSummary() {
     <p>Push-Ups Completed: ${reps}</p>
     <p>Time Spent: ${formattedTimeSpent}</p>
     <p>${medalText}</p>
-    <p>"Health is wealth!"</p>
   `);
 
   // Reset blockchain submission UI
@@ -362,6 +363,28 @@ function showSummary() {
   });
 }
 
+function showPositiveMessage() {
+  const positiveMessages = [
+    "Great job on your workout! Regular exercise can boost your mood and energy levels.",
+    "Awesome effort! Consistent exercise helps improve your cardiovascular health.",
+    "Well done! Exercise strengthens your muscles and bones, improving overall fitness.",
+    "Fantastic work! Regular physical activity can help reduce stress and anxiety.",
+    "Excellent! Exercise can improve your sleep quality and cognitive function.",
+  ];
+
+  const randomMessage =
+    positiveMessages[Math.floor(Math.random() * positiveMessages.length)];
+
+  const messageContainer = createDiv();
+  messageContainer.parent("screen");
+  messageContainer.class("positive-message");
+  messageContainer.html(`
+    <p>${randomMessage}</p>
+    <p>Keep up the great work and stay consistent!</p>
+    <p>Click RESET to see instructions or START to begin again.</p>
+  `);
+}
+
 function stopDetection() {
   if (video) {
     video.stop(); // Stops the video stream
@@ -371,6 +394,9 @@ function stopDetection() {
   clear(); // Clear the canvas
   clearInterval(timerInterval); // Stop the timer
   console.log("Detection stopped");
+
+  // Show positive message
+  showPositiveMessage();
 
   // Show summary modal
   showSummary();
@@ -390,6 +416,18 @@ function resetDetection() {
   clear();
   console.log("Application reset");
   loop();
+
+  // Remove positive message if it exists
+  const positiveMessage = select(".positive-message");
+  if (positiveMessage) {
+    positiveMessage.remove();
+  }
+
+  // Hide welcome message
+  const welcomeMessage = select("#welcomeMessage");
+  if (welcomeMessage) {
+    welcomeMessage.hide();
+  }
 
   // Show instructions
   showView("#instructions");

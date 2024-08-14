@@ -51,6 +51,9 @@
       <p>
         Please rotate your device to landscape mode for a better experience.
       </p>
+      <button id="dismissOrientationButton" class="dismiss-button">
+        Dismiss
+      </button>
     </div>
     <div id="game-container">
       <div id="banner">
@@ -143,5 +146,18 @@
         your browser settings.
       </p>
     </noscript>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const dismissButton = document.getElementById(
+          "dismissOrientationButton"
+        );
+        const orientationMessage =
+          document.getElementById("orientationMessage");
+
+        dismissButton.addEventListener("click", () => {
+          orientationMessage.style.display = "none";
+        });
+      });
+    </script>
   </body>
 </html>

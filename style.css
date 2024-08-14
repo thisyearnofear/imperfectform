@@ -107,6 +107,29 @@ h1 {
   text-align: center;
 }
 
+.positive-message {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fcb131;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.positive-message p {
+  margin-bottom: 15px;
+}
+
 /* Loading animation */
 .loading-container {
   position: absolute;
@@ -460,24 +483,36 @@ button:hover {
   position: relative;
 }
 
-/* Orientation message */
 .orientation-message {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: #fff;
-  font-size: 20px;
+  background: rgba(0, 0, 0, 0.75); /* Semi-transparent black background */
+  color: #fcb131; /* Gold color text */
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
-  z-index: 1000;
-  padding: 20px;
-  box-sizing: border-box;
+  font-size: 10px; /* Smaller font size for the overlay text */
+  text-transform: uppercase;
+  pointer-events: none; /* Prevents interaction with the overlay */
+}
+
+.dismiss-button {
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  font-size: 16px; /* Font size */
+  margin-top: 10px; /* Margin on top */
+}
+
+.dismiss-button:hover {
+  background-color: #45a049; /* Darker green on hover */
 }
 
 /* Mobile Styles */
