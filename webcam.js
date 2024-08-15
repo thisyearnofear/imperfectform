@@ -165,6 +165,8 @@ const loadingInstructions = [
   "Hands shoulder-width apart, back straight",
   "Lower body to an inch from ground, extend arms fully at top",
   "Maintain a steady pace throughout",
+  "Stretch while you wait?",
+  "Looong wait time Fix: RESET & START again",
 ];
 
 function startDetection() {

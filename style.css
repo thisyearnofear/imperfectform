@@ -452,6 +452,27 @@ button:hover {
   color: #fcb131;
   text-align: center;
   margin-bottom: 15px;
+  position: relative;
+  display: inline-block; /* Ensure the h2 and button are inline */
+}
+
+.load-button {
+  position: relative;
+  top: -5px; /* Adjust as needed to align with the h2 */
+  margin-left: 20px; /* Adjust as needed to align with the h2 */
+  font-family: "Press Start 2P", cursive;
+  font-size: 12px;
+  padding: 5px 10px;
+  color: #000;
+  background-color: #fcb131;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.load-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 5px #fcb131;
 }
 
 #leaderboardTable {
@@ -476,27 +497,20 @@ button:hover {
   background-color: rgba(252, 177, 49, 0.1);
 }
 
-.load-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  font-family: "Press Start 2P", cursive;
-  font-size: 12px;
-  padding: 5px 10px;
-  color: #000;
-  background-color: #fcb131;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
+#leaderboardTable tr.blue-entry {
+  background-color: rgba(29, 33, 242, 0.1); /* Light blue background */
 }
 
-.load-button:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 5px #fcb131;
+#leaderboardTable tr.pink-entry {
+  background-color: rgba(255, 105, 180, 0.1); /* Light pink background */
 }
 
-.leaderboard-container {
-  position: relative;
+#leaderboardTable tr.blue-entry td {
+  color: #1d21f2; /* Base blue text */
+}
+
+#leaderboardTable tr.pink-entry td {
+  color: #ff69b4; /* Hot pink text */
 }
 
 .orientation-message {

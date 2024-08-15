@@ -112,7 +112,7 @@
     <div id="summaryModal" class="modal" style="display: none">
       <div class="modal-content">
         <span class="close-button">&times;</span>
-        <h2>Workout Summary</h2>
+        <h2>Summary</h2>
         <div
           class="olympic-rings"
           aria-label="Olympic Rings"
@@ -132,7 +132,12 @@
           </button>
         </div>
         <div class="blockchain-submission">
-          <p>Submit score to leaderboard (0.01 Matic)</p>
+          <p>Submit score to leaderboard</p>
+          <select id="networkSelect">
+            <option value="" disabled selected>Choose Chain</option>
+            <option value="amoy">Polygon Amoy</option>
+            <option value="base">Base Sepolia</option>
+          </select>
           <button id="connectWalletButton">Connect Wallet</button>
           <button id="submitScoreButton" style="display: none">
             Submit Score
